@@ -45,12 +45,10 @@ type TestComponent2 struct {
 }
 
 func (t *TestComponent2) Init(applicationContext container.ApplicationContext) {
-	// Use type-based dependency injection
-	// This will detect the TestComponent and set t.t with proper type
+	// Use type-based dependency injection - cleaner API without mentioning "type"
 	var testComponent *TestComponent
-	err := applicationContext.GetComponentByType(&testComponent)
-	if err != nil {
-		slog.Error("Failed to get test component by type", "error", err)
+	if err := applicationContext.GetComponent(&testComponent); err != nil {
+		slog.Error("Failed to get test component", "error", err)
 		return
 	}
 
@@ -70,16 +68,15 @@ type RunnableComponent struct {
 }
 
 func (t *RunnableComponent) Init(applicationContext container.ApplicationContext) {
-	// This will auto-register a dependency on "test2"
-	test2, err := applicationContext.GetComponent("test2")
-	if err != nil {
-		panic(err)
+	// This will auto-register a dependency on "test2" using cleaner type-based API
+	var test2 *TestComponent2
+	if err := applicationContext.GetComponent(&test2); err != nil {
+		slog.Error("Failed to get test2 component", "error", err)
+		return
 	}
 
-	// Check if we can safely cast
-	if t2, ok := test2.(*TestComponent2); ok {
-		t.t = t2
-	}
+	// Set our field directly (no cast needed)
+	t.t = test2
 
 	// Always initialize the channel
 	t.done = make(chan struct{})

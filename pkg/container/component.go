@@ -1,6 +1,9 @@
 package container
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Component represents a container-managed component
 type Component interface {
@@ -19,6 +22,35 @@ type LifecycleComponent interface {
 	Start(context.Context)
 	// Stop is called when the container shuts down
 	Stop(context.Context)
+}
+
+// BackgroundComponent represents a component that runs in the background
+// The container will manage its lifecycle and goroutine
+type BackgroundComponent interface {
+	LifecycleComponent
+	// Run is executed in a goroutine managed by the container
+	// It should block until complete or until ctx is cancelled
+	Run(ctx context.Context)
+}
+
+// ScheduledComponent represents a component that needs to run repeatedly
+// The container will manage its lifecycle and scheduling
+type ScheduledComponent interface {
+	LifecycleComponent
+	// GetSchedule returns the schedule for this component
+	GetSchedule() Schedule
+	// Execute is called according to the schedule
+	Execute(ctx context.Context)
+}
+
+// Schedule defines when a scheduled component should run
+type Schedule struct {
+	// Fixed interval between executions
+	Interval time.Duration
+	// Initial delay before first execution
+	InitialDelay time.Duration
+	// Whether to run immediately on startup
+	RunOnStartup bool
 }
 
 // ConfigurableComponent can be configured after creation

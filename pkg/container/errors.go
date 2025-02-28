@@ -25,6 +25,14 @@ func (e *ContainerError) Unwrap() error {
 	return e.Cause
 }
 
+// ErrorWithCode creates a new container error with the given code and formatted message
+func ErrorWithCode(code string, format string, args ...interface{}) *ContainerError {
+	return &ContainerError{
+		Code:    code,
+		Message: fmt.Sprintf(format, args...),
+	}
+}
+
 // ComponentNotFoundError returns an error for when a component is not found
 func ComponentNotFoundError(name string) *ContainerError {
 	return &ContainerError{
