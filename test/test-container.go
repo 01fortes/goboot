@@ -1,9 +1,9 @@
 package main
 
 import (
-	"GoBoot/pkg/boot"
-	"GoBoot/pkg/container"
 	"context"
+	"github.com/01fortes/goboot/pkg/boot"
+	"github.com/01fortes/goboot/pkg/container"
 	"log/slog"
 	"time"
 )
@@ -29,9 +29,9 @@ type TestComponent struct {
 	str string
 }
 
-func (t *TestComponent) Init(applicationContext container.ApplicationContext) {
+func (t *TestComponent) Init(ctx container.ApplicationContext) {
 	// Dependencies are auto-discovered by what we access
-	t.str = applicationContext.GetVariable("some.test")
+	t.str = ctx.GetVariable("some.test")
 	slog.Info("TestComponent initialized", "str", t.str)
 }
 
@@ -44,10 +44,10 @@ type TestComponent2 struct {
 	t *TestComponent
 }
 
-func (t *TestComponent2) Init(applicationContext container.ApplicationContext) {
+func (t *TestComponent2) Init(ctx container.ApplicationContext) {
 	// Use type-based dependency injection - cleaner API without mentioning "type"
 	var testComponent *TestComponent
-	if err := applicationContext.GetComponent(&testComponent); err != nil {
+	if err := ctx.GetComponent(&testComponent); err != nil {
 		slog.Error("Failed to get test component", "error", err)
 		return
 	}
@@ -67,10 +67,10 @@ type RunnableComponent struct {
 	done chan struct{}
 }
 
-func (t *RunnableComponent) Init(applicationContext container.ApplicationContext) {
+func (t *RunnableComponent) Init(ctx container.ApplicationContext) {
 	// This will auto-register a dependency on "test2" using cleaner type-based API
 	var test2 *TestComponent2
-	if err := applicationContext.GetComponent(&test2); err != nil {
+	if err := ctx.GetComponent(&test2); err != nil {
 		slog.Error("Failed to get test2 component", "error", err)
 		return
 	}

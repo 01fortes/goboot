@@ -49,7 +49,18 @@ func (c *container) RegisterFactory(factory Factory) {
 }
 
 // RegisterStarter adds a starter to the container
-func (c *container) RegisterStarter(starter Starter) {
+func (c *container) RegisterStarter(s interface{}) {
+	// Support both our internal Starter and the core.Starter
+	var starter Starter
+
+	switch st := s.(type) {
+	case Starter:
+		starter = st
+	default:
+		c.logger.Warn("Unknown starter type, ignoring", "type", reflect.TypeOf(s))
+		return
+	}
+
 	c.starters = append(c.starters, starter)
 }
 
@@ -175,11 +186,11 @@ func New(ctx context.Context, cfg *Config, block func(ContextBuilder)) (Applicat
 		factories:         []Factory{},
 	}
 
-	// Set up dependency resolver and initializer
-	res.dependencyResolver = newDependencyResolver(res, compRegistry, metricsCollector, logger)
-
 	// Register components and variables
 	block(res)
+
+	// Set up dependency resolver and initializer
+	res.dependencyResolver = newDependencyResolver(res, compRegistry, metricsCollector, logger)
 
 	// Run factories to register components
 	logger.Info("Running component factories", "count", len(res.factories))
