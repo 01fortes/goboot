@@ -1,0 +1,42 @@
+site_name: GoBoot Documentation
+site_description: Documentation for the GoBoot framework
+site_author: GoBoot Authors
+
+repo_url: https://github.com/01fortes/goboot
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    primary: blue
+    accent: blue
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+
+nav:
+  - Home: index.md
+  - Tutorials:
+    - Getting Started: tutorials/getting-started.md
+  - Components:
+    - Overview: components/index.md
+    - Lifecycle: components/lifecycle.md
+    - Dependency Injection: components/dependency-injection.md
+  - Starters:
+    - Overview: starters/index.md
+    - Creating Starters: starters/creating-starters.md
+  - Reference:
+    - Core Concepts: reference/core-concepts.md
+  - Examples:
+    - Overview: examples/index.md
+    - HTTP Server: examples/http-server.md
