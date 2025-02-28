@@ -29,5 +29,4 @@ When adding documentation:
 4. Include working examples
 
 ## License
-
-The documentation is licensed under the same license as the GoBoot framework (MIT).
+--
