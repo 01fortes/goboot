@@ -8,7 +8,6 @@ import (
 	"syscall"
 
 	"github.com/01fortes/goboot/pkg/container"
-	"github.com/01fortes/goboot/pkg/container/starter"
 )
 
 // Application represents a complete application
@@ -74,32 +73,5 @@ func New(block func(container.ContextBuilder)) *Application {
 		container:         cont,
 		shutdown:          shutdown,
 		autoConfigEnabled: true, // Enabled by default
-	}
-}
-
-// AutoConfigurationRegistrar is the interface for registering auto-configurations
-type AutoConfigurationRegistrar interface {
-	// RegisterAutoConfiguration registers an auto-configuration
-	RegisterAutoConfiguration(starter.AutoConfigurer)
-}
-
-// Global auto-configuration registry
-var (
-	autoConfigRegistry = make([]starter.AutoConfigurer, 0)
-)
-
-// RegisterAutoConfiguration registers an auto-configuration globally
-func RegisterAutoConfiguration(config starter.AutoConfigurer) {
-	autoConfigRegistry = append(autoConfigRegistry, config)
-}
-
-// EnableAutoConfiguration creates an auto-configuration for a component
-func EnableAutoConfiguration(name string, targetType interface{}, properties *starter.Properties, configFunc func(container.ContextBuilder, interface{}) error) starter.AutoConfigurer {
-	return starter.AutoConfigurer{
-		Name:       name,
-		Properties: properties,
-		ConfigureFunc: func(builder container.ContextBuilder, config interface{}) error {
-			return configFunc(builder, config)
-		},
 	}
 }
