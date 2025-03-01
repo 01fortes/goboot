@@ -31,5 +31,5 @@ type ContextBuilder interface {
 	// RegisterFactory adds a component factory
 	RegisterFactory(factory Factory)
 	// RegisterStarter adds a starter to the container
-	RegisterStarter(starter interface{})
+	RegisterStarter(starter Starter)
 }

@@ -50,18 +50,7 @@ func (c *container) RegisterFactory(factory Factory) {
 }
 
 // RegisterStarter adds a starter to the container
-func (c *container) RegisterStarter(s interface{}) {
-	// Support both our internal Starter and the core.Starter
-	var starter Starter
-
-	switch st := s.(type) {
-	case Starter:
-		starter = st
-	default:
-		c.logger.Warn("Unknown starter type, ignoring", "type", reflect.TypeOf(s))
-		return
-	}
-
+func (c *container) RegisterStarter(starter Starter) {
 	c.starters = append(c.starters, starter)
 }
 
