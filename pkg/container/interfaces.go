@@ -7,8 +7,10 @@ type ApplicationContext interface {
 	GetComponent(target interface{}) error
 	// GetComponentByName returns a component by name (generally discouraged - use GetComponent instead)
 	GetComponentByName(name string) (Component, error)
-	// GetVariable returns a variable by name
+	// GetVariable returns a variable by name as a string
 	GetVariable(name string) string
+	// GetVariableRaw returns the raw variable value without string conversion
+	GetVariableRaw(name string) interface{}
 	// HasComponent checks if a component exists
 	HasComponent(name string) bool
 	// GetComponentNames returns all registered component names
@@ -23,9 +25,9 @@ type ContextBuilder interface {
 	// RegisterComponent adds a component to the container
 	RegisterComponent(component Component) error
 	// RegisterVariable adds a variable to the container
-	RegisterVariable(name string, value string)
-	// RegisterVariableLoader adds a variable loader
-	RegisterVariableLoader(loader VariableLoader)
+	RegisterVariable(name string, value interface{})
+	// AddVariableLoader adds a variable loader
+	AddVariableLoader(loader VariableLoader)
 	// RegisterFactory adds a component factory
 	RegisterFactory(factory Factory)
 	// RegisterStarter adds a starter to the container

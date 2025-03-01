@@ -1,0 +1,22 @@
+# Default configuration
+server:
+  port: 8080
+  host: localhost
+  
+database:
+  url: jdbc:mysql://localhost:3306/myapp
+  username: root
+  password: default-password
+  pool:
+    min: 5
+    max: 20
+    idle-timeout: 300
+    
+logging:
+  level: info
+  format: json
+  
+feature-flags:
+  new-ui: false
+  metrics: true
+  audit: true

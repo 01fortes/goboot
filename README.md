@@ -6,7 +6,9 @@ GoBoot is a lightweight dependency injection and application bootstrapping frame
 
 - Component-based architecture
 - Dependency injection
-- Configuration management
+- Configuration management with Spring Boot-style profiles
+- YAML configuration with profile support (application.yml, application-dev.yml, etc.)
+- Environment variable binding and overrides
 - Lifecycle management (initialization, startup, shutdown)
 - Modular "starters" for easy integration of common components
 - Parallel component startup and shutdown
@@ -19,16 +21,18 @@ go get github.com/01fortes/goboot
 
 ## Usage
 
+### Basic Application
+
 ```go
 package main
 
 import (
     "github.com/01fortes/goboot/pkg/boot"
-    "github.com/01fortes/goboot/pkg/api/component"
+    "github.com/01fortes/goboot/pkg/container"
 )
 
 func main() {
-    app := boot.New(func(builder ContextBuilder) {
+    app := boot.New(func(builder container.ContextBuilder) {
         // Register components and configuration
         builder.RegisterVariable("app.name", "MyApp")
         builder.RegisterComponent(&MyComponent{})
@@ -39,6 +43,50 @@ func main() {
     
     // Run the application
     app.Run()
+}
+```
+
+### Using Profile-Based Configuration
+
+```go
+package main
+
+import (
+    "github.com/01fortes/goboot/pkg/boot"
+    "github.com/01fortes/goboot/pkg/container"
+)
+
+func main() {
+    app := boot.New(func(builder container.ContextBuilder) {
+        // Add YAML configuration with profile support
+        builder.AddVariableLoader(container.ProfileYamlLoader{
+            ConfigPath: "config", // Directory containing config files
+            // Optional: explicitly set profiles instead of using GO_BOOT_ACTIVE_PROFILES env var
+            // Profiles: []string{"dev", "local"},
+        })
+        
+        // Add environment variable support (with prefix)
+        builder.AddVariableLoader(container.EnvVariableLoader{
+            Prefix: "APP_", // Only load environment variables with APP_ prefix 
+        })
+        
+        // Register components
+        builder.RegisterComponent(&MyService{})
+    })
+    
+    // Run the application
+    app.Run()
+}
+
+// Component that uses configuration values
+type MyService struct {
+    // Values can be injected from config files or environment variables
+    ServerPort int    `inject:"variable:server.port"`
+    AppName    string `inject:"variable:app.name"`
+}
+
+func (s *MyService) Name() string {
+    return "myService"
 }
 ```
 

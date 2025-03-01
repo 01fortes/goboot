@@ -69,8 +69,13 @@ func (i *defaultComponentInitializer) initComponent(name string, visited map[str
 	// Initialize the component for real this time
 	i.logger.Debug("Initializing component", "name", name)
 	start := time.Now()
-	comp.Init(i.container)
+	err = comp.Init(i.container)
 	duration := time.Since(start)
+
+	if err != nil {
+		i.logger.Error("Component initialization failed", "name", name, "error", err)
+		return err
+	}
 
 	// Record metrics
 	i.metrics.RecordInitDuration(name, duration)

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func main() {
+func mains() {
 	// Create and start the application
 	app := boot.New(func(cnt container.ContextBuilder) {
 		// Register variables
@@ -29,10 +29,11 @@ type TestComponent struct {
 	str string
 }
 
-func (t *TestComponent) Init(ctx container.ApplicationContext) {
+func (t *TestComponent) Init(ctx container.ApplicationContext) error {
 	// Dependencies are auto-discovered by what we access
 	t.str = ctx.GetVariable("some.test")
 	slog.Info("TestComponent initialized", "str", t.str)
+	return nil
 }
 
 func (t *TestComponent) Name() string {
@@ -44,17 +45,18 @@ type TestComponent2 struct {
 	t *TestComponent
 }
 
-func (t *TestComponent2) Init(ctx container.ApplicationContext) {
+func (t *TestComponent2) Init(ctx container.ApplicationContext) error {
 	// Use type-based dependency injection - cleaner API without mentioning "type"
 	var testComponent *TestComponent
 	if err := ctx.GetComponent(&testComponent); err != nil {
 		slog.Error("Failed to get test component", "error", err)
-		return
+		return err
 	}
 
 	// Set our field to the discovered component
 	t.t = testComponent
 	slog.Info("TestComponent2 initialized", "test_str", t.t.str)
+	return nil
 }
 
 func (t *TestComponent2) Name() string {
@@ -67,12 +69,12 @@ type RunnableComponent struct {
 	done chan struct{}
 }
 
-func (t *RunnableComponent) Init(ctx container.ApplicationContext) {
+func (t *RunnableComponent) Init(ctx container.ApplicationContext) error {
 	// This will auto-register a dependency on "test2" using cleaner type-based API
 	var test2 *TestComponent2
 	if err := ctx.GetComponent(&test2); err != nil {
 		slog.Error("Failed to get test2 component", "error", err)
-		return
+		return err
 	}
 
 	// Set our field directly (no cast needed)
@@ -81,6 +83,7 @@ func (t *RunnableComponent) Init(ctx container.ApplicationContext) {
 	// Always initialize the channel
 	t.done = make(chan struct{})
 	slog.Info("RunnableComponent initialized")
+	return nil
 }
 
 func (t *RunnableComponent) Name() string {

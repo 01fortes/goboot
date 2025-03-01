@@ -95,35 +95,56 @@ func (r *defaultComponentRegistry) GetNames() []string {
 
 // VariableRegistry manages variable registration and retrieval
 type VariableRegistry interface {
-	Register(name, value string)
-	Get(name string) string
+	Register(name string, value interface{})
+	Get(name string) interface{}
+	GetString(name string) string
 }
 
 // defaultVariableRegistry implements VariableRegistry
 type defaultVariableRegistry struct {
-	variables map[string]string
+	variables map[string]interface{}
 	mu        sync.RWMutex
 	logger    *slog.Logger
 }
 
 func newVariableRegistry(logger *slog.Logger) *defaultVariableRegistry {
 	return &defaultVariableRegistry{
-		variables: make(map[string]string),
+		variables: make(map[string]interface{}),
 		logger:    logger,
 	}
 }
 
-func (r *defaultVariableRegistry) Register(name, value string) {
+func (r *defaultVariableRegistry) Register(name string, value interface{}) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	r.logger.Debug("Registering variable", "name", name)
+	r.logger.Debug("Registering variable", "name", name, "type", fmt.Sprintf("%T", value))
 	r.variables[name] = value
 }
 
-func (r *defaultVariableRegistry) Get(name string) string {
+func (r *defaultVariableRegistry) Get(name string) interface{} {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	return r.variables[name]
+}
+
+func (r *defaultVariableRegistry) GetString(name string) string {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	value := r.variables[name]
+	if value == nil {
+		return ""
+	}
+
+	// Convert value to string if possible
+	switch v := value.(type) {
+	case string:
+		return v
+	case fmt.Stringer:
+		return v.String()
+	default:
+		return fmt.Sprintf("%v", v)
+	}
 }

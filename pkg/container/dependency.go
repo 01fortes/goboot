@@ -133,6 +133,10 @@ func (a *accessTrackingContext) GetVariable(name string) string {
 	return a.container.GetVariable(name)
 }
 
+func (a *accessTrackingContext) GetVariableRaw(name string) interface{} {
+	return a.container.GetVariableRaw(name)
+}
+
 func (a *accessTrackingContext) HasComponent(name string) bool {
 	// Track component checking as well
 	exists := a.container.HasComponent(name)
@@ -182,7 +186,7 @@ func (r *defaultDependencyResolver) discoverComponentDependencies(name string) (
 	// This won't actually initialize the component fully, just track dependencies
 	start := time.Now()
 	r.logger.Debug("Discovering dependencies", "component", name)
-	comp.Init(tracker)
+	_ = comp.Init(tracker) // Ignore errors during dependency discovery phase
 
 	// Record metrics
 	r.metrics.RecordDependencyCount(name, len(tracker.accessedDeps))

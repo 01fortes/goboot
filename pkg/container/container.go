@@ -8,7 +8,8 @@ import (
 	"time"
 )
 
-// container is the central dependency container implementation
+// Container is the central dependency container implementation
+// First letter is capitalized to make it accessible to other files in the package
 type container struct {
 	config      *Config
 	logger      *slog.Logger
@@ -34,12 +35,12 @@ func (c *container) RegisterComponent(component Component) error {
 }
 
 // RegisterVariable adds a variable to the container
-func (c *container) RegisterVariable(name string, value string) {
+func (c *container) RegisterVariable(name string, value interface{}) {
 	c.variableRegistry.Register(name, value)
 }
 
-// RegisterVariableLoader adds a variable loader
-func (c *container) RegisterVariableLoader(loader VariableLoader) {
+// AddVariableLoader adds a variable loader
+func (c *container) AddVariableLoader(loader VariableLoader) {
 	c.variablesLoaders = append(c.variablesLoaders, loader)
 }
 
@@ -126,6 +127,11 @@ func (c *container) GetComponent(target interface{}) error {
 
 // GetVariable returns a variable by name
 func (c *container) GetVariable(name string) string {
+	return c.variableRegistry.GetString(name)
+}
+
+// GetVariableRaw returns the raw variable value (not converted to string)
+func (c *container) GetVariableRaw(name string) interface{} {
 	return c.variableRegistry.Get(name)
 }
 

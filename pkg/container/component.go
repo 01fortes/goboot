@@ -10,7 +10,8 @@ type Component interface {
 	// Init initializes the component with container context
 	// The container will track which components are accessed during Init
 	// to determine dependencies automatically
-	Init(ApplicationContext)
+	// Returns an error if initialization fails
+	Init(ApplicationContext) error
 	// Name returns the unique identifier for this component
 	Name() string
 }
@@ -90,8 +91,9 @@ func (c ComponentBase) Name() string {
 }
 
 // NoOpInit is a no-op implementation of Init
-func (c ComponentBase) Init(ApplicationContext) {
+func (c ComponentBase) Init(ApplicationContext) error {
 	// No-op implementation
+	return nil
 }
 
 // Ensure that ComponentBase implements Component

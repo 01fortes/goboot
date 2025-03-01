@@ -1,0 +1,13 @@
+# Development profile configuration
+server:
+  port: 8081  # Override port for development
+  
+database:
+  username: dev-user
+  password: dev-password
+  
+logging:
+  level: debug  # More verbose logging for development
+  
+feature-flags:
+  new-ui: true  # Enable new UI in development
